@@ -1,6 +1,13 @@
 #lang scheme
 
 ; Utility functions
+(provide
+ set-debug ; set DEBUG mode
+ println   ; print line
+ printlist ; print list, first element heading
+ printd    ; print only when DEBUG is ON
+ printdl   ; print list only when DEBUG is ON
+ )
 
 ; DEBUG Mode
 (define DEBUG #f)
