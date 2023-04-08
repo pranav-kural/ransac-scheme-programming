@@ -5,6 +5,7 @@
  set-debug ; set DEBUG mode
  println   ; print line
  printlist ; print list, first element heading
+ printlistn ; print list with each element on newline, first arg title, second list
  printd    ; print only when DEBUG is ON
  printdl   ; print list only when DEBUG is ON
  )
@@ -27,6 +28,12 @@
 (define (printlist lst)
   (display (car lst))
   (for-each display (cdr lst))
+  (newline))
+
+; function to display title and list elements, with one element per line
+(define (printlistn title lst)
+  (println title)
+  (for-each println lst)
   (newline))
     
 ; print when DEBUG is ON

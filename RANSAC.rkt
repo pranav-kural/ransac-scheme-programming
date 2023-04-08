@@ -17,4 +17,7 @@
 
 
 ; function to pick 3 random points from list of points
-(println (list-ref Ps (random (length Ps))))
+(define Points (list-ref Ps (random (length Ps))))
+
+; function to generate plane equation
+(println (first Points))
