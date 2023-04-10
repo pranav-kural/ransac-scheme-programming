@@ -1,10 +1,10 @@
 #lang scheme
 
 ; functions to work with a 3D Plane
-(provide diff plane getDistanceFromPlane getPlaneSupport)
+(provide diff getPlane getDistanceFromPlane getPlaneSupport)
 
 ; function to get equation of a plane in 3D given list of 3 points
-(define (plane p1 p2 p3)
+(define (getPlane p1 p2 p3)
   (let* (
            (v1 (diff p1 p3))
            (v2 (diff p1 p2))
@@ -15,8 +15,6 @@
            )
      (list a b c d)
     ))
-  
-
 
 ; function to get difference between two points
 (define (diff p1 p2)

@@ -6,6 +6,8 @@
  println   ; print line
  printlist ; print list, first element heading
  printlistn ; print list with each element on newline, first arg title, second list
+ printerr ; print formatted error message
+ printerrl ; print formatted error message and list containing additonal info
  printd    ; print only when DEBUG is ON
  printdl   ; print list only when DEBUG is ON
  )
@@ -16,7 +18,7 @@
 ; function to update debug mode
 (define (set-debug debugMode)
   (set! DEBUG debugMode)
-  (printlist (list "DEBUG mode : " DEBUG)))
+  (printlist (list "" "DEBUG mode : " (if (eq? DEBUG #t) "ON" "OFF"))))
 
 ; function to print message and then a newline
 (define println
@@ -26,13 +28,35 @@
 
 ; function to display elements of given list where first element is title and tail contains list to be printed
 (define (printlist lst)
-  (display (car lst))
+  (if (empty? (car lst)) ; if no title
+      (display "") ; do nothing
+      (and (display (car lst))
+           (newline)))
   (for-each display (cdr lst))
   (newline))
 
 ; function to display title and list elements, with one element per line
 (define (printlistn title lst)
-  (println title)
+  (if (not (empty? title))
+      (println title)
+      #t)
+  (for-each println lst)
+  (newline))
+
+; function to print error
+(define (printerr x)
+  (display "!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+  (newline)
+  (display "ERROR: ")
+  (display x)
+  (newline))
+
+; function to display title and list elements, with one element per line
+(define (printerrl title lst)
+  (println "!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+  (display "ERROR: ")
+  (display title)
+  (newline)
   (for-each println lst)
   (newline))
     

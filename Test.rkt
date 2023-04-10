@@ -1,8 +1,9 @@
 #lang scheme
 
 
-(require "Plane.rkt")
+(require "Plane.rkt") ; function to work with 3D plane
 (require "RANSACFiles.rkt") ; function to read and write to file
+(require "RANSAC.rkt") ; RANSAC algorithmic functions
 (require "utilities.rkt") ; generic utilities
 
 ; Test functions to test important core methods
@@ -13,7 +14,7 @@
 (define TEST_FILE "./data/input/Point_Cloud_1_No_Road_Reduced.xyz")
 
 (define (test-read)
-  (println "-------- Tesing Reading Point Cloud -------- ")
+  (println "-------- Testing Reading Point Cloud -------- ")
   (println "Reading Sample Point Cloud file and displaying randomly selected 3 points")
  
   ; read file and load the list of 3D points
@@ -26,7 +27,8 @@
 
   ; function to generate plane equation
   (printlistn "Selected random points: " (list Point1 Point2 Point3))
-  (println "-------- Test Finished -------- "))
+  (println "#: Test Passed ")
+  (newline))
   
 
 ; Testing diff
@@ -39,6 +41,7 @@
   (println (if (equal? actual expected)
                "#: Test Passed"
                "#: Test Failed"))
+    (newline)
        ))
 
 
@@ -53,11 +56,12 @@
        (p2 '(3.408226942 -0.062265186 -0.12261193))
        (p3 '(11.64480557 7.586239857 3.792138564))
        (expected '(-19.24478941973517 -22.416438566567404 84.2872272864299 74.52946568859088))
-       (actual (plane p1 p2 p3)))
+       (actual (getPlane p1 p2 p3)))
     (printlistn "Actual Result: (each line in order a, b, c, d)" actual)
     (println (if (equal? actual expected)
                "#: Test Passed"
                "#: Test Failed"))
+    (newline)
        )
     )
 
@@ -76,8 +80,10 @@
   (println (if (equal? actual expected)
                "#: Test Passed"
                "#: Test Failed"))
+    (newline)
        ))
 
+; Test: supporting points for plane
 (define (test-support)
   (let* (
          (points (readXYZ TEST_FILE))
@@ -85,23 +91,69 @@
          (eps 0.5)
          (expected 1532)
          (actual (cdr (getPlaneSupport plane points eps))))
-  (println "-------- Testing Plane Support --------")
+    (println "-------- Testing Plane Support --------")
+    (newline)
+    (printlistn "Test parameters" (list (list "Test plane: " plane) (list "eps: " eps) (list "Size of point cloud: " (length points)) (list "Expected support: " expected)))
+    (printlist (list "Actual support: " actual))
+    (println (if (equal? actual expected)
+                 "#: Test Passed"
+                 "#: Test Failed"))
+    (newline)
+    ))
+
+; Test number of iterations
+(define (test-num-iterations)
+  (let* (
+        (confidence 0.99)
+        (percentage 0.3)
+        (expected 168)
+        (actual (ransacNumberOfIterations confidence percentage)))
+        (println "-------- Testing Plane Support --------")
+    (newline)
+    (printlistn "Test parameters" (list (list "confidence: " confidence) (list "percentage: " percentage) (list "Expected number of iterations: " expected)))
+    (printlist (list "Actual number of iterations: " actual))
+    (println (if (equal? actual expected)
+                 "#: Test Passed"
+                 "#: Test Failed"))
+    (newline)
+    ))
+
+; Test: RANSAC algorithm
+(define (test-ransac)
+  (println "-------- Testing RANSAC --------")
   (newline)
-  (printlistn "Test parameters" (list (list "Test plane: " plane) (list "eps: " eps) (list "Size of point cloud: " (length points)) (list "Expected support: " expected)))
-  (printlist (list "Actual support: " actual))
-  (println (if (equal? actual expected)
-               "#: Test Passed"
-               "#: Test Failed"))
-       ))
+  (let* (
+         (confidence 0.99)
+         (percentage 0.3)
+         (eps 0.5)
+         (expected 1800) ; appromixate minimum amount of supporting points when percentage is around 30%, confidence is 99% and epsilion 0.5
+         (actual (planeRANSAC TEST_FILE confidence percentage eps)))
+    (printlistn "Test parameters" (list (list "confidence: " confidence) (list "percentage: " percentage) (list "eps: " eps) (list "Expected minimum dominant plane size: " expected)))
+    (display "Actual size of dominant plane: ")
+    (display (cdr actual))
+    (newline)
+    (printlist (list "" "Dominant plane ((a b c d) . <supporting points>): " actual))
+    (println (if (> (cdr actual) expected)
+                 "#: Test Passed"
+                 "#: Test Failed"))
+    (newline)
+    ))
+
+    
 
 ; Main test function
-; Can comment out functions which you don't want to run the test for
 (define (run-tests)
-  ;(test-read)
-  ;(test-diff)
-  ;(test-plane)
-  ;(test-distance)
+  (println "-------- Running Tests --------")
+  (newline)
+  ; Can comment out functions which you don't want to run the test for
+  (test-read)
+  (test-diff)
+  (test-plane)
+  (test-distance)
   (test-support)
+  (test-num-iterations)
+  (test-ransac)
   )
+
 
 (run-tests)
