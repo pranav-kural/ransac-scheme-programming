@@ -1,0 +1,5 @@
+*.rkt~
+#*.rkt#*#
+compiled/drracket/errortrace/
+.DS_Store
+StudentInfo.md

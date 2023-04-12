@@ -138,8 +138,6 @@
     (newline)
     ))
 
-    
-
 ; Main test function
 (define (run-tests)
   (println "-------- Running Tests --------")
@@ -153,6 +151,5 @@
   (test-num-iterations)
   (test-ransac)
   )
-
-
+; initiate the tests
 (run-tests)
