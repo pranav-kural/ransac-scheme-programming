@@ -39,10 +39,20 @@
 ;      - increment the support of plane
 ;  - Return: a pair containing plane and number of supporting points
 (define (getPlaneSupport plane points eps)
-  (define support 0) ; initial value
-  (for-each
-   (lambda (point)
-     (if (<= (getDistanceFromPlane point plane) eps)
-         (set! support (+ 1 support))
-         #t)) points)
-  (cons plane support))
+  (getPlaneSupportAux plane points eps 0))
+
+; Helper function for getPlaneSupport
+ (define (getPlaneSupportAux plane points eps support)
+   (if (empty? points)        ; if at end of points
+       (cons plane support)  ; return result
+       (let ((point (first points)))
+         (if (<= (getDistanceFromPlane point plane) eps)
+           (getPlaneSupportAux plane (cdr points) eps (+ 1 support)) ; if point on plane, increment support and recursively make call for rest of the points
+           (getPlaneSupportAux plane (cdr points) eps support))))) ; if point NOT on plane, DON'T update support and recursively make call for rest of the points
+       
+       
+
+(define (withinSupport point plane eps)
+  (if (<= (getDistanceFromPlane point plane) eps)
+         (list point)
+         '()))

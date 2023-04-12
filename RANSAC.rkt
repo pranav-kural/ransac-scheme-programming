@@ -7,8 +7,6 @@
 
 (provide ransacNumberOfIterations planeRANSAC)
 
-; used in debugging to print additional informative messages (printd, printdl)
-(set-debug #f)
 
 ; sample filename with path
 (define TEST_FILE "./data/input/Point_Cloud_1_No_Road_Reduced.xyz")

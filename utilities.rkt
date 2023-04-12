@@ -2,7 +2,6 @@
 
 ; Utility functions
 (provide
- set-debug ; set DEBUG mode
  println   ; print line
  printlist ; print list, first element heading
  printlistn ; print list with each element on newline, first arg title, second list
@@ -14,11 +13,6 @@
 
 ; DEBUG Mode
 (define DEBUG #f)
-
-; function to update debug mode
-(define (set-debug debugMode)
-  (set! DEBUG debugMode)
-  (printlist (list "" "DEBUG mode : " (if (eq? DEBUG #t) "ON" "OFF"))))
 
 ; function to print message and then a newline
 (define println

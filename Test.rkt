@@ -108,7 +108,7 @@
         (percentage 0.3)
         (expected 168)
         (actual (ransacNumberOfIterations confidence percentage)))
-        (println "-------- Testing Plane Support --------")
+        (println "-------- Testing Number of Iterations --------")
     (newline)
     (printlistn "Test parameters" (list (list "confidence: " confidence) (list "percentage: " percentage) (list "Expected number of iterations: " expected)))
     (printlist (list "Actual number of iterations: " actual))
