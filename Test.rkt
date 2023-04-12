@@ -1,8 +1,7 @@
 #lang scheme
 
-
+; import dependencies
 (require "Plane.rkt") ; function to work with 3D plane
-(require "RANSACFiles.rkt") ; function to read and write to file
 (require "RANSAC.rkt") ; RANSAC algorithmic functions
 (require "utilities.rkt") ; generic utilities
 

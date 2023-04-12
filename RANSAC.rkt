@@ -1,15 +1,21 @@
 #lang scheme
 
 ; import required files
-(require "RANSACFiles.rkt") ; function to read and write to file
 (require "Plane.rkt") ; function to work with 3D plane
 (require "utilities.rkt") ; generic utilities
 
-(provide ransacNumberOfIterations planeRANSAC)
+; export functions
+(provide readXYZ ransacNumberOfIterations planeRANSAC)
 
-
-; sample filename with path
-(define TEST_FILE "./data/input/Point_Cloud_1_No_Road_Reduced.xyz")
+; function to read given point cloud file and return a list of 3d points
+(define (readXYZ fileIn)
+ (let ((sL (map (lambda s (string-split (car s)))
+                (cdr (file->lines fileIn)))))
+   (map (lambda (L)
+          (map (lambda (s)
+                 (if (eqv? (string->number s) #f)
+                     s
+                     (string->number s))) L)) sL)))
 
 ; function to get a list of three randomly selected points from point cloud
 (define (getThreeRandomPoints points)
@@ -20,28 +26,23 @@
 (define (ransacNumberOfIterations confidence percentage)
   (inexact->exact (floor (/ (log (- 1 confidence)) (log (- 1 (* percentage percentage percentage)))))))
 
-; RANSAC algorithm
-; Pseudo-code
-; Initialize a bestPlane variable to hold the pair (<plane> <support>)
-; Loop: for the numberOfIterations
-;  - Extract a random plane by choosing three points at random from point cloud
-;  - Get support of the plane in the point cloud
-;  - If: support of current plane greater than support of current best plane, update best plane
-; Return: best plane
-(define (ransac points eps numOfIterations)
-  (define bestSupport (cons '() 0))
-  (printlist (list "---- Staring RANSAC ----" "Size of point cloud: " (length points) ", eps: " eps ", number of iterations: " numOfIterations))
-  (and (do ((i 0 (+ i 1)))
-         ((> i numOfIterations))
-         (let* (
-                (randomPoints (getThreeRandomPoints points))
-                (plane (getPlane (first randomPoints) (second randomPoints) (third randomPoints)))
-                (support (getPlaneSupport plane points eps)))
+
+; helper function for ransac - implements the RANSAC algorithm
+(define (ransacAux points eps numOfIterations bestSupport)
+  ; base case
+  (if (<= numOfIterations 0)
+      bestSupport ; return result
+      ; recurvise case
+      (let* (    
+                (randomPoints (getThreeRandomPoints points)) ; get three random points
+                (plane (getPlane (first randomPoints) (second randomPoints) (third randomPoints))) ; get equation of the plane formed from three points
+                (support (getPlaneSupport plane points eps))) ; get support of the plane
+           ; if found a plane with better support than current best support plane
            (if (> (cdr support) (cdr bestSupport))
-               (and (set! bestSupport support) (printdl (list "Better dominant plane found " bestSupport)))
-               #t)))
-       bestSupport)
-  )
+               ; decrement number of iterations in each recursive call
+               (ransacAux points eps (- numOfIterations 1) support) ; recursive call with new support plane
+               (ransacAux points eps (- numOfIterations 1) bestSupport) ; recursive call with old best support plane
+               ))))
 
 ; function to validate inputs and initiate ransac
 (define (planeRANSAC filename confidence percentage eps)
@@ -49,5 +50,12 @@
       (printerr "Invalid filename, no filename provided")
       (if (or (< confidence 0) (< percentage 0) (< eps 0))
           (and (printerrl "Invalid parameter values for RANSAC. Negative values provided" (list "confidence: " confidence "percentage: " percentage "eps: " eps)) '())
-          (ransac (readXYZ filename) eps (ransacNumberOfIterations confidence percentage))))) ; if all inputs valid, run ransac and return dominant plane
-           
+          (; if all inputs valid, run ransac and return dominant plane
+           let (
+                (points (readXYZ filename)) ; get list of points
+                (numOfIterations (ransacNumberOfIterations confidence percentage))) ; calc num of iterations
+           (printlist (list "---- Staring RANSAC ----" "Size of point cloud: " (length points) ", eps: " eps ", number of iterations: " numOfIterations))
+           ; make call to the auxiliary recursive function with bestSupport argument initially empty pair
+           (ransacAux points eps numOfIterations (cons '() 0)))
+
+          ))) 

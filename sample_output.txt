@@ -1,0 +1,12 @@
+---- Staring RANSAC ----
+Size of point cloud: 5927, eps: 0.5, number of iterations: 168
+Test parameters
+(confidence:  0.99)
+(percentage:  0.3)
+(eps:  0.5)
+(Expected minimum dominant plane size:  1800)
+
+Actual size of dominant plane: 2472
+
+Dominant plane ((a b c d) . <supporting points>): ((4.6736124389570985 
+2.3843952214239907 123.71094469772893 -17.046757611927635) . 2472)
